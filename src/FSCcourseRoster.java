@@ -215,6 +215,7 @@ public class FSCcourseRoster {
         }
 
         if (numStudents == 0) {
+            System.out.printf("\tTotal number of student records: %d\n", numStudents);
             System.out.printf("\tAverage Score: %.2f\n", 0.0);
             System.out.printf("\tHighest Score: %.2f\n", 0.0);
             System.out.printf("\tLowest Score:  %.2f\n", 0.0);
@@ -254,11 +255,11 @@ public class FSCcourseRoster {
                     helpPtr.getFirstName(),
                     helpPtr.getLastName(),
                     helpPtr.getStudentID());
-            System.out.printf("\t\tExam 1:      %d\n", helpPtr.getExamGrades()[0]);
-            System.out.printf("\t\tExam 2:      %d\n", helpPtr.getExamGrades()[1]);
-            System.out.printf("\t\tFinal Exam:  %d\n", helpPtr.getExamGrades()[2]);
-            System.out.printf("\t\tFinal Grade: %.2f\n", helpPtr.getFinalGrade());
-            System.out.printf("\t\tLetter Grade: %c\n\n", helpPtr.getLetterGrade());
+            System.out.printf("\t\tExam 1:       %d\n", helpPtr.getExamGrades()[0]);
+            System.out.printf("\t\tExam 2:       %d\n", helpPtr.getExamGrades()[1]);
+            System.out.printf("\t\tFinal Exam:   %d\n", helpPtr.getExamGrades()[2]);
+            System.out.printf("\t\tFinal Grade:  %.2f\n", helpPtr.getFinalGrade());
+            System.out.printf("\t\tLetter Grade: %c\n", helpPtr.getLetterGrade());
 
             //Don't forget to increase :))
             helpPtr = helpPtr.getNext();

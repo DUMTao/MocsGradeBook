@@ -36,40 +36,40 @@ public class Main {
             String[] userCmd = scanner.nextLine().trim().split(" ");
 
             if (userCmd[0].equals("ADDRECORD")){
-                System.out.println("Command: AddRecord");
+                System.out.println("Command: ADDRECORD");
                 AddRecord(userCmd, courses);
             }
 
             else if (userCmd[0].equals("DELETERECORD")){
-                System.out.println("Command: DeleteRecord");
+                System.out.println("Command: DELETERECORD");
                 DeleteRecord(userCmd, courses);
             }
 
             else if (userCmd[0].equals("SEARCHBYID")){
-                System.out.println("Command: SearchByID");
+                System.out.println("Command: SEARCHBYID");
                 SearchByID(userCmd, courses);
             }
 
             else if (userCmd[0].equals("SEARCHBYNAME")){
-                System.out.println("Command: SearchByName");
+                System.out.println("Command: SEARCHBYNAME");
                 SearchByName(userCmd, courses);
             }
 
 
             else if (userCmd[0].equals("DISPLAYSTATS")){
-                System.out.printf("Command: DisplayStats (%s)\n", userCmd[1]);
+                System.out.printf("Command: DISPLAYSTATS (%s)\n", userCmd[1]);
                 displayStats(userCmd);
             }
 
             else if (userCmd[0].equals("DISPLAYSTUDENTS")){
-                System.out.printf("Command: DisplayStudents (%s)\n", userCmd[1]);
+                System.out.printf("Command: DISPLAYSTUDENTS (%s)\n", userCmd[1]);
                 displayStudents(userCmd);
             }
 
             else if (userCmd[0].equals("QUIT")){
-                System.out.println("Command: QUIT");
-                System.out.println("Thank you for using the FSC Grade Book.\n");
+                System.out.println("Thank you for using the the FSC Grade Book.\n");
                 System.out.println("Goodbye.");
+                break;
             }
 
         }
@@ -105,15 +105,17 @@ public class Main {
                             tempStudent.getLastName(),
                             tempStudent.getStudentID(),
                             courses[i].getCourseNumber());
-                    System.out.printf("\tFinal Grade: %.2f (%c)\n\n",
+                    System.out.printf("\tFinal Grade: %.2f (%c).\n\n",
                             tempStudent.getFinalGrade(),
                             tempStudent.getLetterGrade());
                 }
             }
         }
+
+
         //Else, if the course doesn't exist = error message
         if (!foundCourse) {
-            System.out.printf("ERROR: cannot add student. Course \"%s\" does not exist.\n\n", userCmd[1]);
+            System.out.printf("\tERROR: cannot add student. Course \"%s\" does not exist.\n\n", userCmd[1]);
         }
     }
 
@@ -121,12 +123,31 @@ public class Main {
     //Receives: student ID, x > 0
     public static void DeleteRecord(String[] userCmd, FSCcourseRoster[] courses){
         int studentID = Integer.parseInt(userCmd[1]);
-        //Find the student ID by traversing the linked list
+        boolean foundStudent = false;
 
+        //Loop through the courses to find the student ID
+        for (int i = 0; i < courses.length; i++){
+            //Check if the student ID exists in that course
+            if (courses[i].searchID(studentID)){
+                foundStudent = true;
 
+                Student tempStudent = courses[i].findNode(studentID);
+                //Delete the student obj from the course it's registered in
+                courses[i].delete(studentID);
 
-        //Delete the student obj from ALL the courses they're registered in
+                //Print the thingies
+                System.out.printf("\t%s %s (ID# %d) has been deleted from %s.\n",
+                        tempStudent.getFirstName(), tempStudent.getLastName(),
+                        tempStudent.getStudentID(),
+                        courses[i].getCourseNumber());
+            }
+        }
+        System.out.println();
+
         //If ID not found, print error message
+        if (!foundStudent){
+            System.out.printf("\tERROR: cannot delete student. ID# %d does not exist.\n\n", studentID);
+        }
 
     }
 
@@ -135,30 +156,38 @@ public class Main {
     public static void SearchByID(String[] userCmd, FSCcourseRoster[] courses){
         int studentID = Integer.parseInt(userCmd[1]);
         boolean foundStudent = false;
+        Student once = null;
+
         //Loop courses by the number of courses not the array length
         for (int i = 0; i < courses.length; i++){
             //Check if that student ID exists in that course
             if (courses[i].searchID(studentID)){
-                foundStudent = true;
                 Student tempStudent = courses[i].findNode(studentID);
 
+                if (!foundStudent){
+                    foundStudent = true;
+                    once = tempStudent;
+                    //Print the header only once :>
+                    System.out.printf("Student Record for %s %s (ID# %d):\n",
+                            tempStudent.getFirstName(),
+                            tempStudent.getLastName(),
+                            studentID);
+                }
+
                 //print thingies
-                System.out.printf("Student Record for %s %s (ID# %d):\n",
-                        tempStudent.getFirstName(),
-                        tempStudent.getLastName(),
-                        studentID);
                 System.out.printf("\tCourse: %s\n", courses[i].getCourseNumber());
                 System.out.printf("\t\tExam 1:       %d\n", tempStudent.getExamGrades()[0]);
                 System.out.printf("\t\tExam 2:       %d\n", tempStudent.getExamGrades()[1]);
                 System.out.printf("\t\tFinal Exam:   %d\n", tempStudent.getExamGrades()[2]);
                 System.out.printf("\t\tFinal Grade:  %.2f\n", tempStudent.getFinalGrade());
-                System.out.printf("\t\tLetter Grade: %c\n\n", tempStudent.getLetterGrade());
+                System.out.printf("\t\tLetter Grade: %c\n", tempStudent.getLetterGrade());
             }
         }
+        System.out.println();
 
         //If the studentID doesn't match in any course, error!
         if (!foundStudent){
-            System.out.printf("ERROR: there is no record for student ID# %d.\n\n", studentID);
+            System.out.printf("\tERROR: there is no record for student ID# %d.\n\n", studentID);
         }
 
     }
@@ -166,22 +195,26 @@ public class Main {
 
     //Receives: Student first and last name
     public static void SearchByName(String[] userCmd, FSCcourseRoster[] courses){
-        String fName = userCmd[2];
-        String lName = userCmd[1];
+        String firstName = userCmd[1];
+        String lastName = userCmd[2];
         boolean foundStudent = false;
+        Student once = null;
 
         //Loop courses by the number of courses
         for (int i = 0; i < courses.length; i++){
             //Check if that student name exists in that course
-            if (courses[i].searchName(fName, lName)){
-                foundStudent = true;
-                Student tempStudent = courses[i].findNodeName(fName, lName);
+            if (courses[i].searchName(firstName, lastName)){
+                Student tempStudent = courses[i].findNodeName(firstName, lastName);
 
+                if (!foundStudent){
+                    foundStudent = true;
+                    once = tempStudent;
+                    System.out.printf("Student Record for %s %s (ID# %d):\n",
+                            tempStudent.getFirstName(),
+                            tempStudent.getLastName(),
+                            tempStudent.getStudentID());
+                }
                 //print thingies
-                System.out.printf("Student Record for %s %s (ID# %d):\n",
-                        tempStudent.getFirstName(),
-                        tempStudent.getLastName(),
-                        tempStudent.getStudentID());
                 System.out.printf("\tCourse: %s\n", courses[i].getCourseNumber());
                 System.out.printf("\t\tExam 1:       %d\n", tempStudent.getExamGrades()[0]);
                 System.out.printf("\t\tExam 2:       %d\n", tempStudent.getExamGrades()[1]);
@@ -192,7 +225,7 @@ public class Main {
         }
 
         if (!foundStudent) {
-            System.out.printf("ERROR: there is no record for student \"%s %s\".\n\n", fName, lName);
+            System.out.printf("\tERROR: there is no record for student \"%s %s\".\n\n", firstName, lastName);
         }
     }
 
@@ -218,7 +251,7 @@ public class Main {
         }
 
         if (userCmd[1].equals("ALL")) {
-            System.out.printf("Statistical Results for %s Courses:\n", userCmd[1]);
+            System.out.println("Statistical Results for All Courses:");
 
             //Loop through all the courses and add the stats
             for (int i = 0; i < courses.length; i++){
@@ -292,7 +325,7 @@ public class Main {
             }
         }
         else {
-            System.out.printf("Statistical Results for %s Courses:\n", userCmd[1]);
+            System.out.printf("Statistical Results of %s:\n", userCmd[1]);
 
             //Only Print that course
             for (int i = 0; i < courses.length; i++) {
@@ -306,6 +339,7 @@ public class Main {
     //Receives: Course Number or "ALL"
     public static void displayStudents(String[] userCmd){
         boolean hasStudent = false;
+        boolean courseExists = false;
 
         if (userCmd[1].equals("ALL")) {
             //Print the stats for each course
@@ -316,15 +350,21 @@ public class Main {
                 }
             }
             if (!hasStudent) {
-                System.out.println("\tERROR: there are no students currently is the system.\n");
+                System.out.println("\tERROR: there are no students currently in the system.\n");
             }
         }
         else {
             //Only Print that course
             for (int i = 0; i < courses.length; i++) {
-                if (courses[i].getCourseNumber().equals(userCmd[1])) {
+                if (courses[i].getCourseNumber().equals(userCmd[1]) && !courses[i].isEmpty()) {
                     courses[i].printRoster();
+                    courseExists = true;
                 }
+            }
+
+            //if that course is empty, error :(
+            if (!courseExists){
+                System.out.printf("\tERROR: there are no student records for %s.\n\n", userCmd[1]);
             }
         }
     }

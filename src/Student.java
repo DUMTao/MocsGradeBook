@@ -1,5 +1,5 @@
 //Create the actual nodes (LLnode)
-import java.util.*;
+
 public class Student {
     private String courseNum;
     private int studentID;
@@ -19,7 +19,7 @@ public class Student {
     private Student next;
 
     // Constructors
-    public Student(String courseNum, int studentID, String lastName, String firstName, int[] examGrades) {
+    public Student(String courseNum, int studentID, String firstName, String lastName, int[] examGrades) {
         this.courseNum = courseNum;
         this.studentID = studentID;
         this.lastName = lastName;
